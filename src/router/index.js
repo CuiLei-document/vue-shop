@@ -19,7 +19,20 @@ const routes = [
     component: () => import('@/components/Home.vue'),
     meta: {
       isLogin: true
-    }
+    },
+    redirect: '/hello',
+    children: [
+      {
+        path: '/hello',
+        name: 'Hello',
+        component: () => import('@/components/homeComps/HelloWorld.vue')
+      },
+      {
+        path: '/users',
+        name: 'Users',
+        component: () => import('@/components/users/Users.vue')
+      }
+    ]
   }
 ]
 

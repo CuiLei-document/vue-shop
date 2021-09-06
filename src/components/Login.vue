@@ -75,7 +75,6 @@ export default {
         let { data: res } = await this.$http.post('login', this.loginForm)
         if (res.meta.status === 200) {
           this.$message.success('登录成功')
-          console.log(res)
           window.sessionStorage.setItem('token', res.data.token)
           this.$router.push('/home')
         } else {

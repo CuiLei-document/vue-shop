@@ -10,6 +10,11 @@ import axios from 'axios'
 
 axios.defaults.baseURL = 'https://lianghj.top:8888/api/private/v1/'
 axios.defaults.timeout = 5000
+axios.interceptors.request.use(config => {
+  config.headers.Authorization = window.sessionStorage.getItem('token')
+  return config
+})
+
 Vue.prototype.$http = axios
 
 Vue.config.productionTip = false
