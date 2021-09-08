@@ -325,7 +325,6 @@ export default {
       } else {
         return this.$message.error('获取失败')
       }
-      console.log(res)
       // 递归获取三级节点
       this.getLeafKeys(scope, this.defKeys)
       this.showSetRightDialogVisible = true
