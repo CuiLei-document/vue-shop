@@ -72,6 +72,7 @@
                 type="warning"
                 icon="el-icon-setting"
                 size="mini"
+                @click="setRoles(scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -151,6 +152,35 @@
           <el-button type="primary" @click="editUserForm">确 定</el-button>
         </span>
       </el-dialog>
+      <!-- 修改分配脚色对话框 -->
+
+      <el-dialog
+        title="分配角色"
+        :visible.sync="rolesDialogVisible"
+        width="30%"
+        @close="closeRoleDialog"
+      >
+        <div>
+          <p>当前用户姓名： {{ userInfo.username }}</p>
+          <p>当前用户角色： {{ userInfo.role_name }}</p>
+          <p>
+            当前选中的：
+            <el-select v-model="selectedRoleId" placeholder="请选择">
+              <el-option
+                v-for="item in rolesList"
+                :key="item.id"
+                :label="item.roleName"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </p>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="rolesDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="saveRoleInfo">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -178,6 +208,7 @@ export default {
       }
     }
     return {
+      // 获取用户列表的参数对象
       queryList: {
         query: '',
         pagenum: 1,
@@ -185,7 +216,9 @@ export default {
       },
       usersList: [],
       total: 0,
+      // 添加用户对话框
       addUserVisible: false,
+      // 添加用户数据表单
       addForm: {
         username: '',
         password: '',
@@ -194,6 +227,7 @@ export default {
       },
       editDialogVisible: false,
       editForm: {},
+      // 验证表单规则
       addFormRules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -215,6 +249,7 @@ export default {
           { validator: checkMobile, trigger: 'blur' },
         ],
       },
+      // 验证添加用户表单
       editFormRules: {
         email: [
           { required: true, message: '请输入邮箱', trigger: 'blur' },
@@ -225,6 +260,13 @@ export default {
           { validator: checkMobile, trigger: 'blur' },
         ],
       },
+      rolesDialogVisible: false, // 权限对话框
+      // 获取所有对象
+      userInfo: {},
+      // 所有的数据列表
+      rolesList: [],
+      // 当前选中的角色
+      selectedRoleId: '',
     }
   },
   created() {
@@ -235,7 +277,6 @@ export default {
       const { data: res } = await this.$http.get('users', {
         params: this.queryList,
       })
-      console.log(res)
       if (res.meta.status === 200) {
         this.usersList = res.data.users
         this.total = res.data.total
@@ -243,21 +284,21 @@ export default {
         console.log('获取失败')
       }
     },
+    // 总条数数据
     handleSizeChange(newSize) {
       this.queryList.pagesize = newSize
       this.getUserList()
-      console.log(newSize)
     },
+    // 点击页数获取数据
     handleCurrentChange(newNum) {
       this.queryList.pagenum = newNum
       this.getUserList()
     },
+    // 获取数据操作数据的状态
     async usersStateChanged(scope) {
-      console.log(scope)
       const { data: res } = await this.$http.put(
         `users/${scope.id}/state/${scope.mg_state}`
       )
-      console.log(res)
       if (res.meta.status === 200) {
         this.$message.success('修改成功')
       } else {
@@ -276,7 +317,6 @@ export default {
           const { data: res } = await this.$http.post('users', this.addForm)
           this.addUserVisible = false
           this.getUserList()
-          console.log(res)
         } else {
           this.$message.error('您输入的内容不完整')
         }
@@ -342,20 +382,41 @@ export default {
       } else {
         return this.$message.info('取消删除用户')
       }
-      console.log(res)
+    },
+    // 展示修改角色对话框
+    async setRoles(userInfo) {
+      // 保存所有对象信息
+      this.userInfo = userInfo
+      const { data: res } = await this.$http.get('roles')
+      this.rolesList = res.data
+
+      this.rolesDialogVisible = true
+    },
+    // 分配用户角色
+    async saveRoleInfo() {
+      if (!this.selectedRoleId) {
+        return this.$message.error('分配角色失败')
+      }
+
+      const { data: res } = await this.$http.put(
+        `users/${this.userInfo.id}/role`,
+        {
+          rid: this.selectedRoleId,
+        }
+      )
+      if (res.meta.status === 200) {
+        this.$message.success('分配角色成功')
+        this.getUserList()
+        this.rolesDialogVisible = false
+      }
+    },
+    // 清除分配角色选中状态
+    closeRoleDialog() {
+      this.selectedRoleId = ''
+      this.userInfo = {}
     },
   },
 }
 </script>
 <style lang="scss" scoped>
-.el-row {
-  margin-top: 10px;
-}
-.el-table {
-  margin-top: 20px;
-  font-size: 14px;
-}
-.el-pagination {
-  margin-top: 10px;
-}
 </style>
