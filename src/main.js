@@ -10,6 +10,10 @@ import axios from 'axios'
 import TreeTable from 'vue-table-with-tree-grid'
 import dayjs from 'dayjs'
 
+import * as echarts from 'echarts'
+
+Vue.prototype.$echarts = echarts
+
 // 富文本编辑器
 import VueQuillEditor from 'vue-quill-editor'
 
