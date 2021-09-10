@@ -27,3 +27,13 @@ body,
 .el-pagination {
     margin-top: 10px;
 }
+.el-step{
+    margin-top: 20px;
+    font-size: 16px;
+}
+.el-step__description {
+    font-size: 20px;
+}
+.ql-editor{
+    min-height: 300px;
+}

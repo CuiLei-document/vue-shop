@@ -423,7 +423,7 @@ export default {
       })
     },
     // 保存数据 tag 标签
-    async saveAttrParams() {
+    async saveAttrParams(row) {
       // 保存数据
       const { data: res } = await this.$http.put(
         `categories/${this.caseaId}/attributes/${row.attr_id}`,
